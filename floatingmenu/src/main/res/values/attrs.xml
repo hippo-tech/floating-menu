@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="FloatingMenu">
+
+        <attr name="fm_option_backgroundColor" format="color"/>
+        <attr name="fm_option_textSize" format="dimension"/>
+        <attr name="fm_option_textColor" format="color"/>
+        <attr name="rm_button_background" format="reference"/>
+    </declare-styleable>
+
+</resources>
