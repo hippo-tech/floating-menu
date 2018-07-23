@@ -56,6 +56,7 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     private int mButtonBackground;
     private Typeface mOptionTypeface;
 
+    private OnFloatingMenuClickListener clickListener;
 
     /**
      * Simple constructor to use when creating a view from code.
@@ -158,6 +159,16 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
         }
     }
+
+    public void addOnFloatingMenuClickListener(@NonNull OnFloatingMenuClickListener onFloatingMenuClickListener) {
+        this.clickListener = onFloatingMenuClickListener;
+
+        for (TextView v : views) {
+            v.setOnClickListener(this);
+        }
+    }
+
+
 
     private void animate(float degree) {
 
@@ -357,7 +368,7 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
     }
 
-    private void getLevelConstraints(@NonNull View view, @NonNull View anchorView, @NonNull ConstraintSet cs, @NonNull int anchorEndConstraint) {
+    private void getLevelConstraints(@NonNull View view, @NonNull View anchorView, @NonNull ConstraintSet cs, int anchorEndConstraint) {
         cs.clear(view.getId(), ConstraintSet.TOP);
         cs.clear(view.getId(), ConstraintSet.START);
 
@@ -419,6 +430,10 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
                 animate(0.0f);
                 currentDegree = 0.0f;
             }
+        } else if (v instanceof TextView) {
+            if (clickListener!=null) {
+                clickListener.onClick((TextView) v, views.indexOf(v));
+            }
         }
     }
 
@@ -440,7 +455,14 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     public void setOptionTypeface(@NonNull Typeface optionTypeface) {
         this.mOptionTypeface = optionTypeface;
         if (views!=null && !views.isEmpty()) {
-            
+            for (TextView v : views) {
+                v.setTypeface(optionTypeface);
+                mainLayout.invalidate();
+            }
         }
+    }
+
+    public interface OnFloatingMenuClickListener {
+        void onClick(TextView view, int position);
     }
 }

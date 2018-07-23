@@ -79,7 +79,7 @@ public class FloatingMenuAdapter extends ArrayAdapter<String> {
         optionMenu.setId(View.generateViewId());
         optionMenu.setText(getItem(position));
         optionMenu.setAlpha(0.0f);
-
+        optionMenu.setClickable(true);
         if (drawables != null && position < drawables.length) {
             optionMenu.setCompoundDrawablesWithIntrinsicBounds(drawables[position], 0, 0, 0);
             optionMenu.setCompoundDrawablePadding(0);
