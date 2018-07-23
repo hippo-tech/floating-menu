@@ -400,19 +400,7 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
     }
 
-    private TextView getTextView(String text) {
-        TextView tv = (TextView) View.inflate(getContext(), R.layout.txt_floating_layout, null);
-//        tv.setVisibility(View.GONE);
-        tv.setAlpha(0.0f);
-        tv.setId(View.generateViewId());
-        tv.setText(text);
-        tv.setLines(1);
-        tv.setMaxLines(1);
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(0, 0);
-        tv.setLayoutParams(lp);
 
-        return tv;
-    }
 
     /**
      * Called when a view has been clicked.

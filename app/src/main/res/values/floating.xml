@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="optionsMenu">
+    <item>First Option</item>
+    <item>Second Option</item>
+    <item>Third Option</item>
+
+    </string-array>
+
+    <integer-array name="drawables">
+        <item>@drawable/button_fab_mini_enabled</item>
+        <item>@drawable/button_fab_mini_enabled_copy</item>
+        <item>@drawable/button_fab_mini_enabled_copy_2</item>
+    </integer-array>
+
+</resources>
