@@ -19,7 +19,9 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by alexlopez on 18/7/18.
+ * Provides views for the {@link FloatingMenu}
+ * <p>
+ * Created by hippo on 18/7/18.
  */
 
 public class FloatingMenuAdapter extends ArrayAdapter<String> {
@@ -64,8 +66,16 @@ public class FloatingMenuAdapter extends ArrayAdapter<String> {
         this.views = new TextView[objects.size()];
     }
 
+    /**
+     * Get a View that displays the data at the specified position in the data set.
+     *
+     * @param position             the position to get the view
+     * @param parent               The parent that this view will eventually be attached to
+     * @param optionTextProperties the {@link OptionTextProperties} with the properties for decorating it
+     * @return A {@link View} corresponding to the data at the specified position.
+     */
     @NonNull
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent, @NonNull OptionTextProperties optionTextProperties) {
+    View getDecoratedView(int position, @NonNull ViewGroup parent, @NonNull OptionTextProperties optionTextProperties) {
 
         if (views != null && views[position] != null) {
             return views[position];
@@ -89,7 +99,7 @@ public class FloatingMenuAdapter extends ArrayAdapter<String> {
         optionMenu.setGravity(Gravity.CENTER_VERTICAL);
         optionMenu.setBackground(changeDrawableShape(optionMenu, optionTextProperties.getBgColor()));
         optionMenu.setTextColor(optionTextProperties.getTextColor());
-        if (optionTextProperties.getTextSize()>0) {
+        if (optionTextProperties.getTextSize() > 0) {
             optionMenu.setTextSize(TypedValue.COMPLEX_UNIT_PX, optionTextProperties.getTextSize());
         }
 
@@ -98,6 +108,13 @@ public class FloatingMenuAdapter extends ArrayAdapter<String> {
         return optionMenu;
     }
 
+    /**
+     * Changes the Drawable Shape with a new bacground color
+     *
+     * @param view          the view to change the shape
+     * @param optionBgColor the new color for the background
+     * @return a new {@link Drawable} to use as new shape for the View
+     */
     private Drawable changeDrawableShape(@NonNull View view, final int optionBgColor) {
 
         final Drawable bg = view.getBackground();
@@ -112,6 +129,11 @@ public class FloatingMenuAdapter extends ArrayAdapter<String> {
 
     }
 
+    /**
+     * How many items are in the data set represented by this Adapter.
+     *
+     * @return Count of items.
+     */
     @Override
     public int getCount() {
         return super.getCount();

@@ -28,13 +28,16 @@ import java.util.List;
 
 
 /**
- * Created by alexlopez on 18/7/18.
+ * This class contains the floating button and expands the menú rotating the button when this is
+ * clicked.
+ * <p>
+ * Created by hippo on 18/7/18.
  */
 
 public class FloatingMenu extends ConstraintLayout implements View.OnClickListener, OptionTextProperties {
 
     public static final int DEFAULT_OPTION_BG_COLOR = Color.TRANSPARENT;
-    public static final float DEFAULT_OPTION_TEXT_SIZE = 16.0f;
+    public static final int DEFAULT_OPTION_TEXT_SIZE = 0;
     public static final int DEFAULT_OPTION_TEXT_COLOR = Color.BLACK;
     public static final int DEFAULT_BUTTON_BACKGROUND_RES_ID = R.drawable.button_fab_standard_enabled;
 
@@ -54,7 +57,6 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     private int mOptionTextSize;
     private int mOptionTextColor;
     private int mButtonBackground;
-    private Typeface mOptionTypeface;
 
     private OnFloatingMenuClickListener clickListener;
 
@@ -109,7 +111,9 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     public FloatingMenu(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        init(attrs, defStyleAttr);
+        if (attrs != null) {
+            init(attrs, defStyleAttr);
+        }
     }
 
     /**
@@ -126,12 +130,20 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
     }
 
-    private void init(AttributeSet attrs, int defStyleAttr) {
+    /**
+     * Inits the View getting attrs and setting the main view.
+     *
+     * @param attrs        The attributes of the XML tag that is inflating the view.
+     * @param defStyleAttr An attribute in the current theme that contains a
+     *                     reference to a style resource that supplies default values for
+     *                     the view. Can be 0 to not look for defaults.
+     */
+    private void init(@NonNull AttributeSet attrs, int defStyleAttr) {
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FloatingMenu, defStyleAttr, 0);
 
         mOptionBgColor = a.getColor(R.styleable.FloatingMenu_fm_option_backgroundColor, DEFAULT_OPTION_BG_COLOR);
-        mOptionTextSize = a.getDimensionPixelSize(R.styleable.FloatingMenu_fm_option_textSize, 0);
+        mOptionTextSize = a.getDimensionPixelSize(R.styleable.FloatingMenu_fm_option_textSize, DEFAULT_OPTION_TEXT_SIZE);
         mOptionTextColor = a.getColor(R.styleable.FloatingMenu_fm_option_textColor, DEFAULT_OPTION_TEXT_COLOR);
         mButtonBackground = a.getResourceId(R.styleable.FloatingMenu_rm_button_background, DEFAULT_BUTTON_BACKGROUND_RES_ID);
 
@@ -148,11 +160,16 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
     }
 
+    /**
+     * Sets the adapter with the TextView collection
+     *
+     * @param floatingMenuAdapter the {@link FloatingMenuAdapter} containing the adapter
+     */
     public void setAdapter(@NonNull FloatingMenuAdapter floatingMenuAdapter) {
         this.adapter = floatingMenuAdapter;
         views = new ArrayList<>(adapter.getCount());
         for (int i = 0; i < adapter.getCount(); i++) {
-            final TextView t = (TextView) adapter.getView(i, this, mainLayout, this);
+            final TextView t = (TextView) adapter.getDecoratedView(i, mainLayout, this);
             views.add(t);
             mainLayout.addView(t);
 
@@ -160,6 +177,11 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
         }
     }
 
+    /**
+     * Adds the click listener to respond to click ecents
+     *
+     * @param onFloatingMenuClickListener the {@link OnFloatingMenuClickListener} with the click listener
+     */
     public void addOnFloatingMenuClickListener(@NonNull OnFloatingMenuClickListener onFloatingMenuClickListener) {
         this.clickListener = onFloatingMenuClickListener;
 
@@ -169,7 +191,11 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     }
 
 
-
+    /**
+     * Animates the button and starts the floating menu expand or collapse events
+     *
+     * @param degree the degree to rotate to
+     */
     private void animate(float degree) {
 
         // Create rotation animation
@@ -343,19 +369,28 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
     }
 
 
-    private void collapseSecondLevel(@NonNull ConstraintSet cs, int position) {
+    /**
+     * Collapses all the options but the first one.
+     *
+     * @param constraintSet the {@link ConstraintSet} to modify for the given position
+     * @param position      the item's position to relocate in the screen
+     */
+    private void collapseSecondLevel(@NonNull ConstraintSet constraintSet, int position) {
         if (position > 0 && position < views.size() - 1) {
-            cs.clear(views.get(position).getId(), ConstraintSet.BOTTOM);
+            constraintSet.clear(views.get(position).getId(), ConstraintSet.BOTTOM);
 
-            cs.connect(views.get(position).getId(), ConstraintSet.TOP, views.get(position - 1).getId(), ConstraintSet.TOP);
-            cs.constrainWidth(views.get(position).getId(), (int) convertDpToPx(getResources(), 0));
+            constraintSet.connect(views.get(position).getId(), ConstraintSet.TOP, views.get(position - 1).getId(), ConstraintSet.TOP);
+            constraintSet.constrainWidth(views.get(position).getId(), (int) convertDpToPx(getResources(), 0));
             views.get(position).setAlpha(0.2f);
         }
     }
 
+    /**
+     * Gets the first item {@link ConstraintSet} with the new position
+     *
+     * @return the {@link ConstraintSet} with the new position
+     */
     private ConstraintSet getFirstLevelConstraints() {
-//        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-//        textView1.setLayoutParams(lp);
 
         ConstraintSet cs = new ConstraintSet();
         cs.clone(mainLayout);
@@ -368,6 +403,14 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
 
     }
 
+    /**
+     * Sets the first level constraints to all the views
+     *
+     * @param view                the {@link View to set the constraints to
+     * @param anchorView          the {@link View} used as anchor to connect the view
+     * @param cs                  the {@link ConstraintSet} to modify
+     * @param anchorEndConstraint the end side connection
+     */
     private void getLevelConstraints(@NonNull View view, @NonNull View anchorView, @NonNull ConstraintSet cs, int anchorEndConstraint) {
         cs.clear(view.getId(), ConstraintSet.TOP);
         cs.clear(view.getId(), ConstraintSet.START);
@@ -396,11 +439,6 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
         return cs;
     }
 
-    private void animateText() {
-
-    }
-
-
 
     /**
      * Called when a view has been clicked.
@@ -419,30 +457,50 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
                 currentDegree = 0.0f;
             }
         } else if (v instanceof TextView) {
-            if (clickListener!=null) {
+            if (clickListener != null) {
                 clickListener.onClick((TextView) v, views.indexOf(v));
             }
         }
     }
 
+    /**
+     * Returns the text color property.
+     *
+     * @return an int representing the {@link android.graphics.Color}
+     */
     @Override
     public int getTextColor() {
         return mOptionTextColor;
     }
 
+    /**
+     * Returns the text size property.
+     *
+     * @return an int with the text size property
+     */
     @Override
     public int getTextSize() {
         return mOptionTextSize;
     }
 
+    /**
+     * Returns the TextView background color property.
+     *
+     * @return an int representing the {@link android.graphics.Color}
+     */
     @Override
     public int getBgColor() {
         return mOptionBgColor;
     }
 
+    /**
+     * Sets the {@link Typeface} for option menu
+     *
+     * @param optionTypeface the new {@link Typeface} to set
+     */
     public void setOptionTypeface(@NonNull Typeface optionTypeface) {
-        this.mOptionTypeface = optionTypeface;
-        if (views!=null && !views.isEmpty()) {
+
+        if (views != null && !views.isEmpty()) {
             for (TextView v : views) {
                 v.setTypeface(optionTypeface);
                 mainLayout.invalidate();
@@ -450,7 +508,17 @@ public class FloatingMenu extends ConstraintLayout implements View.OnClickListen
         }
     }
 
+    /**
+     * This listener gets the click events from the options menu
+     */
     public interface OnFloatingMenuClickListener {
+
+        /**
+         * When one of the options is clicked this listener is invoked to pass the view and its position in menu
+         *
+         * @param view     the clicked {@link TextView}
+         * @param position the position of the view in the menu
+         */
         void onClick(TextView view, int position);
     }
 }
